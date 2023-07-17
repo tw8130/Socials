@@ -1,0 +1,94 @@
+import React from 'react';
+import CommentIcon from '../../img/comment.png';
+import ShareIcon from '../../img/share.png';
+import HeartIcon from '../../img/like.png';
+import NotLikeIcon from '../../img/notlike.png';
+
+const Post = ({ data }) => {
+  return (
+    <div className="bg-white p-4 rounded-md shadow-md">
+      {data.media_type === 'image' ? (
+        <img className="w-full" src={data.media_url} alt="" />
+      ) : (
+        <video className="w-full" src={data.media_url} controls />
+      )}
+
+      <div className="flex items-center space-x-2 mt-2">
+        <img src={data.liked ? HeartIcon : NotLikeIcon} alt="" />
+        <img src={CommentIcon} alt="" />
+        <img src={ShareIcon} alt="" />
+      </div>
+
+      <p className="text-gray-500 text-sm">{data.likes} likes</p>
+
+      <div className="mt-2">
+        <p>
+          <strong>{data.content}</strong>
+        </p>
+        <p>{data.desc}</p>
+      </div>
+    </div>
+  );
+};
+
+export default Post;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// import React from 'react'
+// import './Post.css'
+// import Comment from '../../img/comment.png'
+// import Share from '../../img/share.png'
+// import Heart from '../../img/like.png'
+// import NotLike from '../../img/notlike.png'
+
+
+// const Post = ({data}) => {
+//   return (
+//     <div className="Post">
+//         <img src={data.img} alt="" />
+
+
+//         <div className="postReact">
+//             <img src={data.liked?Heart: NotLike} alt="" />
+//             <img src={Comment} alt="" />
+//             <img src={Share} alt="" />
+//         </div>
+
+
+//         <span style={{color: "var(--gray)", fontSize: '12px'}}>{data.likes} likes</span>
+
+//         <div className="detail">
+//             <span><b>{data.name}</b></span>
+//             <span> {data.desc}</span>
+//         </div>
+//     </div>
+//   )
+// }
+
+// export default Post
