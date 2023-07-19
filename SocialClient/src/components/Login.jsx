@@ -5,7 +5,8 @@ import { Link} from 'react-router-dom';
 import Cookies from 'js-cookie';
 import axios from "axios"
 import { useNavigate } from 'react-router-dom';
-import HomePage from './Home';
+//import HomePage from './Home';
+import Home from "../pages/home/Home";
 
 //'http://localhost:4040/login'
 function LoginPage()  {
@@ -18,13 +19,7 @@ function LoginPage()  {
 
   //const history = useHistory();
 
-  useEffect(() => {
-    // Check if the user is already logged in
-    const session = Cookies.get("session");
-    if (session) {
-      setLoggedIn(true);
-    }
-  }, []);
+ 
 
   const response ={username:username, password:password}
   const handleLogin = async () => {
@@ -38,8 +33,7 @@ function LoginPage()  {
 
       if (response1.data) {
         console.log(response1.data)
-       // Store the session token in the cookie
-       Cookies.set("session", response1.data.token);
+       
        setLoggedIn(true);
 
        const navigateTo = useNavigate();
@@ -57,15 +51,13 @@ function LoginPage()  {
   };
 
   const handleLogout = () => {
-    // Clear the session token from the cookie and log the user out
-    Cookies.remove("session");
+    
     setLoggedIn(false);
   };
 
   if (loggedIn) {
-    return <HomePage onLogout={handleLogout} />;
+    return <Home onLogout={handleLogout} />;
   }
-
 
 
     return (

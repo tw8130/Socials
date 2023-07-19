@@ -7,55 +7,97 @@ import { UilTimes } from "@iconscout/react-unicons";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
-import { useNavigate } from 'react-router-dom';
+//import { Image } from '@cloudinary/react';
+import { Cloudinary } from '@cloudinary/url-gen';
+import { AdvancedImage } from '@cloudinary/react';
+//import cloudinary from 'cloudinary-core';
+
+//import { useNavigate } from 'react-router-dom';
 import Posts from '../Posts/Posts';
 
-const PostShare = () => {
+const PostShare = ({ updatePosts }) => {
   const [content, setContent] = useState("");
-  const [mediaType, setMedia] = useState(null);
+  const [mediaType, setMediaType] = useState(null);
   const [previewMedia, setPreviewMedia] = useState(null);
   const mediaRef = useRef();
-  const [location, setLocation] = useState("");
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [locationId, setLocation] = useState(null);
+  const [taggedUsername, setTaggedUsername] = useState(""); // Add state for taggedUsername
 
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
-  };
+const cloud_name="dkiemwgf6"
+//   const cloudinaryCore = new cloudinary.Cloudinary({ cloud_name: "dkiemwgf6" });
+//const cld = new Cloudinary({cloud: {cloudName: 'dkiemwgf6'}});
+
+  //const navigateTo = useNavigate();
+  //const [selectedDate, setSelectedDate] = useState(null);
+
+  // const handleDateChange = (date) => {
+  //   setSelectedDate(date);
+  // };
 
   const onMediaChange = (event) => {
     if (event.target.files && event.target.files[0]) {
       let mediaFile = event.target.files[0];
-      setMedia(mediaFile);
+      setMediaType(mediaFile.type);
       setPreviewMedia(URL.createObjectURL(mediaFile));
     }
   };
-
+  
+ 
   const handleShare = async () => {
     try {
+        // If an image is selected, upload it to Cloudinary
+    if (previewMedia && (mediaType.includes('image') || mediaType.includes('video'))) {
       const formData = new FormData();
-      formData.append("content", content);
-      if (mediaType) {
-        formData.append("mediaType", mediaType);
-      }
-      formData.append("location", location);
-      formData.append("schedule", selectedDate);
+      formData.append('file', mediaRef.current.files[0]);
+      formData.append('upload_preset', "jwxmmglh"); // Replace with your Cloudinary upload preset
+    
+      const response1 = await axios.post(
+        `https://api.cloudinary.com/v1_1/${cloud_name}/${mediaType.includes('image') ? 'image' : 'video'}/upload`,
+        formData
+      );
+      
+      // Get the public URL of the uploaded image/video from Cloudinary's response
+      const mediaUrl = response1.data.secure_url;
+      console.log('Media uploaded to Cloudinary:', mediaUrl);
+
+      
+
+      // Continue with sharing the post, using imageUrl as the mediaUrl
+      const postData = {
+        content,
+        mediaType,
+        mediaUrl,
+        locationId,
+        taggedUsername,
+      };
 
       // Make the API call to share the post
-      const response = await axios.post("http://localhost:5040/post", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      const response = await axios.post("http://localhost:5040/post", postData,{
+        withCredentials:true
       });
+      if (response.data) {
+        console.log('Post shared successfully:', response.data);
+        updatePosts();
+      }
+    } else {
+      // If no image is selected, continue with sharing the post without mediaUrl
+      const postData = {
+        content,
+        locationId,
+        taggedUsername,
+      };
 
-      console.log("Post shared successfully:", response.data);
-       // Call the updatePosts function to fetch and update the list of posts
-       //updatePosts();
-       const navigateTo = useNavigate();
-        // Redirect to the posts page
-        navigateTo(<Posts/>);
-      // Add logic to update the list of posts or redirect to the posts page
+      // Make the API call to share the post
+      const response = await axios.post("http://localhost:5040/post", postData,{
+        withCredentials:true
+      });
+      if (response.data) {
+        console.log('Post shared successfully:', response.data);
+        updatePosts();
+      }
+    }
     } catch (error) {
-      console.error("Error sharing post:", error);
+      console.error("Error sharing post:", error.response.data);
     }
   };
 
@@ -91,7 +133,7 @@ const PostShare = () => {
         {previewMedia && (
           <div className="flex items-center space-x-1 mt-2">
             <UilTimes className="cursor-pointer" onClick={() => setPreviewMedia(null)} />
-            {mediaType.type.includes("image") ? (
+            {mediaType.includes("image") ? (
               <img className="w-32 h-32 object-cover rounded-md" src={previewMedia} alt="" />
             ) : (
               <video className="w-32 h-32 rounded-md" src={previewMedia} controls />
@@ -110,6 +152,16 @@ const PostShare = () => {
             />
           </div>
           <div className="flex items-center space-x-1 text-primary">
+          <UilScenery />
+          <input
+            className="w-full px-4 py-2 rounded-md border"
+            type="text"
+            placeholder="Tagged Username"
+            value={taggedUsername}
+            onChange={(e) => setTaggedUsername(e.target.value)}
+          />
+        </div>
+          {/* <div className="flex items-center space-x-1 text-primary">
             <UilSchedule />
             <DatePicker
               selected={selectedDate}
@@ -122,7 +174,7 @@ const PostShare = () => {
               className="w-full px-4 py-2 rounded-md border"
               placeholderText="Schedule"
             />
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

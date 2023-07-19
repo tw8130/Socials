@@ -5,19 +5,26 @@ import HeartIcon from '../../img/like.png';
 import NotLikeIcon from '../../img/notlike.png';
 
 const Post = ({ data }) => {
+  const isImage = data.media_type && data.media_type.startsWith('image');
+  const mediaUrl = isImage ? data.media_url : data.mediaUrl; // Use media_type as image URL if it's not a valid Cloudinary URL
+
   return (
     <div className="bg-white p-4 rounded-md shadow-md">
-      {data.media_type === 'image' ? (
-        <img className="w-full" src={data.media_url} alt="" />
+      {isImage ? (
+        <img className="w-full" src={mediaUrl} alt="" />
       ) : (
-        <video className="w-full" src={data.media_url} controls />
+        <video className="w-full" controls>
+          <source src={mediaUrl} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
       )}
 
-      <div className="flex items-center space-x-2 mt-2">
+      <div className="flex items-center space-x-8 mt-2">
         <img src={data.liked ? HeartIcon : NotLikeIcon} alt="" />
         <img src={CommentIcon} alt="" />
         <img src={ShareIcon} alt="" />
       </div>
+
 
       <p className="text-gray-500 text-sm">{data.likes} likes</p>
 

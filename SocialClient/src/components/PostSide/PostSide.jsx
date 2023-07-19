@@ -5,7 +5,7 @@ import './PostSide.css'
 const PostSide = () => {
   return (
    <div className="PostSide">
-       <PostShare/>
+       {/* <PostShare/> */}
        <Posts/>
    </div>
   )
